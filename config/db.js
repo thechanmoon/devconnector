@@ -5,7 +5,10 @@ const db = config.get('mongoURI');
 const connectDB = async () => {
     try{
         mongoose.set('strictQuery', false);
-        await mongoose.connect(db);
+        await mongoose.connect(db, {
+            useNewUrlParser: true,
+            // useCreateIndex: true        
+        });
         console.log('MongoDB Connected');
     }catch(err){
         console.error(err.message);
