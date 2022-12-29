@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const gravatar = require('gravatar');
 const bcrypt = require('bcryptjs');
+// const bcrypt = require('bcrypt');
 const { check, validationResult } = require('express-validator');
 
 const User = require('../../models/User');
@@ -60,17 +61,31 @@ router.post(
             // const salt = await bcrypt.getSalt(10);
 
             // user.password = await bcrypt.hash(password,salt);
+            bcrypt.genSalt(10, function(err, salt) {
+                bcrypt.hash(user.password, salt, function(err, hash) {
+                    // Store hash in your password DB.
+                    if(err)
+                    {
+                        console.log(err.message);
+                        return res.status(500).send('hash gen error');
+                    }
+                    user.password = hash;
+                    user.save();
+                });
+            });
 
-            await user.save();
+            
             //Return jsonwebtoken
 
             console.log(req.body);
             res.send('User registered');
-        }catch{
-
+        }catch(err){
+            console.log(err.message);
+            res.status(500).send('Server error');
         }
-
     }
 );
 
 module.exports = router;
+
+// {"_id":{"$oid":"63ad823b484071c2afa39ebd"},"name":"thechanmoon","email":"thechanmoon@gmail.con","password":"$2a$10$Ik9ZqoQCHC.05vDa63cxgutZNaIQEv9.fLav22YD1JOM6aeG0oX6u","avavatar":"//www.gravatar.com/avatar/b47f6159e86c5e123ac1c3109fe8135f?s=200&r=pg&d=mm","__v":{"$numberInt":"0"}}
