@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const gravatar = require('gravatar');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const config = require('config');
 // const bcrypt = require('bcrypt');
 const { check, validationResult } = require('express-validator');
 
@@ -66,11 +68,12 @@ router.post(
                     // Store hash in your password DB.
                     if(err)
                     {
-                        console.log(err.message);
-                        return res.status(500).send('hash gen error');
+                        throw err;
+                        // console.log(err.message);
+                        // return res.status(500).send('hash gen error');
                     }
                     user.password = hash;
-                    user.save();
+                    user.save(); 
                 });
             });
 
@@ -79,6 +82,17 @@ router.post(
 
             console.log(req.body);
             res.send('User registered');
+
+            // const payload = {
+            //     user: {
+            //         id: user.id
+            //     }
+            // }
+            // jwt.sign(
+            //     payload,
+            //     config.get('jwtSecret'),
+            //     {expireIN:3600}
+            // );
         }catch(err){
             console.log(err.message);
             res.status(500).send('Server error');
